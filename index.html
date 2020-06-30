@@ -56,7 +56,17 @@ print(a())
           </div>
           <div class="col col-sm-5">
             <strong style="margin-top:0;">Resultados:</strong>
-            <pre class="pre-scrollable" style="min-height: 390px;"  id="result"></pre>
+              <div id="myDiagramDiv"
+                style="width:500px; height:250px; background-color: #DAE4E4;">
+              </div>
+              <div>
+                <button id="next" onclick="next()">Avanzar</button>
+                <button id="back" onclick="back()">Retroceder</button>
+                <div><strong>Paso: <span id="actual">0</span> de <span id="total">0</span></strong></div>
+                <div>
+                  <textarea name="output" id="output" cols="30" rows="10"></textarea>
+                </div>                
+              </div>
           </div>
         </div>
       </div> 
@@ -64,6 +74,11 @@ print(a())
       <div class="well" style="text-align:center;margin-bottom:0;border-radius:0;">
         <p>Brought to you by <a href="https://form.io">Form.io</a>
       </div>
+    <script src="https://unpkg.com/gojs/release/go-debug.js"></script>
+    <script
+			  src="https://code.jquery.com/jquery-3.5.1.slim.js"
+			  integrity="sha256-DrT5NfxfbHvMHux31Lkhxg42LY6of8TaYyK50jnxRnM="
+			  crossorigin="anonymous"></script> 
     <script type="text/javascript" src="inicio.js"></script>
 </body>
 </html>
