@@ -40,25 +40,23 @@ document.getElementById('execute').addEventListener('click', function() {
             'Content-Type': 'multipart/form-data'
         }
     }).then(function (res) {
-        console.log('SUCCESS!!');
         json = res.data
-        console.log(json)
         order = load_visualization(json)
         nodes = get_nodes(json,order)
-        console.log(nodes)
         i = 0
         contextos = [0]
         $('#next').prop('disabled', false);
         $('#back').prop('disabled', true);
         $('#actual').html(" "+i+" ")
         $('#total').html(" "+nodes.length-1+" ")
+        $('#output').html("")
         myDiagram.model.nodeDataArray = []
         myDiagram.model.linkDataArray = []
         new_visualization(nodes,1,i,"next")
 
     })
     .catch(function (e) {
-        console.log(e);
+        //console.log(e);
     });
     //document.getElementById('result').innerHTML = result;
 });
@@ -219,7 +217,6 @@ $$(go.GraphLinksModel,
           }
           nodes.push(node)
         }
-        console.log(nodes)
         return nodes  
       }
 
@@ -230,7 +227,6 @@ $$(go.GraphLinksModel,
         for (let i = 0; i < list.length; i++) {
           values[i] = list[i].value          
         }
-        console.log(values)
         return Object.values(values)
       }
 
@@ -313,7 +309,6 @@ $$(go.GraphLinksModel,
         for (let i = 0; i < json.length; i++) {
           order.push([i,json[i]['lineNumber']])
         }
-        console.log(order)
         return order
     }
     function diff(json,position){
