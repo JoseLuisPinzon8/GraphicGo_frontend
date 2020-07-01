@@ -4,16 +4,37 @@ json = []
 nodes = []
 document.getElementById('version').innerHTML = _.VERSION;
 window._ = _;
+
 var editor = ace.edit("code");
 editor.getSession().setTabSize(2);
 editor.getSession().setMode("ace/mode/python");
+editor.getSession().setValue(`def a()->str:
+  for y in [1,2,3,4]:
+    print(y)
+    if(y > 2):
+        return "funciona"
+  return "no funciona"
+
+print(a())`)
+
+var input = ace.edit("input");
+input.getSession().setTabSize(2);
+input.getSession().setMode("ace/mode/text");
+
 document.getElementById('execute').addEventListener('click', function() {
     var codigo = editor.getSession().getValue()
     var blob = new Blob([codigo], { type: 'text/plain' });
     var file = new File([blob], "myfile.txt", {type: "text/plain"});
+    
+    var input_text = input.getSession().getValue()
+    var blob = new Blob([input_text], { type: 'text/plain' });
+    var input_file = new File([blob], "input.txt", {type: "text/plain"});
+    
     var formData = new FormData();
+    
     formData.append("myfile", file);
-    console.log(formData);
+    formData.append("input", input_file);
+
     axios.post('http://localhost:4567/analize', formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
