@@ -1,3 +1,7 @@
+i=0
+contextos = [0]
+json = []
+nodes = []
 document.getElementById('version').innerHTML = _.VERSION;
 window._ = _;
 var editor = ace.edit("code");
@@ -20,6 +24,7 @@ document.getElementById('execute').addEventListener('click', function() {
         console.log(json)
         order = load_visualization(json)
         nodes = get_nodes(json,order)
+        console.log(nodes)
         i = 0
         contextos = [0]
         $('#next').prop('disabled', false);
@@ -31,8 +36,8 @@ document.getElementById('execute').addEventListener('click', function() {
         new_visualization(nodes,1,i,"next")
 
     })
-    .catch(function () {
-        console.log('FAILURE!!');
+    .catch(function (e) {
+        console.log(e);
     });
     //document.getElementById('result').innerHTML = result;
 });
@@ -40,9 +45,10 @@ document.getElementById('execute').addEventListener('click', function() {
 var $$ = go.GraphObject.make;  // for conciseness in defining templates
 
 myDiagram =
-$$(go.Diagram, "myDiagramDiv",{allowMove:true}
+$$(go.Diagram, "myDiagramDiv",{allowMove:true,layout: $$(go.GridLayout)},
     );
-
+    myDiagram.layout.wrappingColumn=1;
+    myDiagram.animationManager.isEnabled = false;
 // This template is a Panel that is used to represent each item in a Panel.itemArray.
 // The Panel is data bound to the item object.
 var fieldTemplate =
@@ -71,7 +77,7 @@ $$(go.Panel, "TableRow",  // this Panel is a row in the containing Table
 myDiagram.nodeTemplate =
 $$(go.Node, "Auto",
     { copyable: false, deletable: false },
-    new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
+    //new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
     // this rectangular shape surrounds the content of the node
     $$(go.Shape,
     { fill: "#EEEEEE" }),
@@ -84,7 +90,7 @@ $$(go.Node, "Auto",
         { fill: "#1570A6", stroke: null }),
         $$(go.TextBlock,
         {
-            alignment: go.Spot.Center,
+            alignment: go.Spot.Left,
             margin: 3,
             stroke: "white",
             textAlign: "center",
@@ -166,7 +172,7 @@ $$(go.GraphLinksModel,
         for (let i = 0; i < order.length; i++) {
           vision = json[order[i][0]]
           callStack = vision['callStack']
-          symbolTables = vision['symbolTables']
+          symbolTable = vision['symbolTable']
           node = {
             key: "",
             fields: [
@@ -174,27 +180,37 @@ $$(go.GraphLinksModel,
             ],
             loc: ""
           }
-          for (let j = 0; j < callStack.length; j++) {          
-            //if (callStack[j]=="program")
-            node.loc = 25*i+" "+0
-            node.key = callStack[j]
-            field_keys = Object.keys(symbolTables[callStack[j]])
-            for (let k = 0; k < field_keys.length; k++) {
-              if(field_keys[k]=='.')
-                continue
-              if (symbolTables[callStack[j]][field_keys[k]].value)
-                node.fields.push({name:field_keys[k],info:symbolTables[callStack[j]][field_keys[k]].value})
+          node.key = symbolTable["."].value
+          field_keys = Object.keys(symbolTable)
+          for (let k = 0; k < field_keys.length; k++) {
+            if(field_keys[k]=='.')
+              continue
+            if (symbolTable[field_keys[k]].value){
+              if (symbolTable[field_keys[k]].type=="list"){
+                node.fields.push({name:field_keys[k],info:list_to_string(symbolTable[field_keys[k]].value)})
+              }
               else
-                node.fields.push({name:field_keys[k],info:symbolTables[callStack[j]][field_keys[k]].type})
+                node.fields.push({name:field_keys[k],info:symbolTable[field_keys[k]].value})
             }
-            
-            
+              
+            else
+              node.fields.push({name:field_keys[k],info:symbolTable[field_keys[k]].type})
           }
           nodes.push(node)
         }
-        
-        return nodes
-  
+        console.log(nodes)
+        return nodes  
+      }
+
+      function list_to_string(list){
+        if (list =='None')
+          return 'None'
+        values = {}
+        for (let i = 0; i < list.length; i++) {
+          values[i] = list[i].value          
+        }
+        console.log(values)
+        return Object.values(values)
       }
 
       function next(){
@@ -275,6 +291,7 @@ $$(go.GraphLinksModel,
         for (let i = 0; i < json.length; i++) {
           order.push([i,json[i]['lineNumber']])
         }
+        console.log(order)
         return order
     }
     function diff(json,position){
