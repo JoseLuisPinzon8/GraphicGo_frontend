@@ -246,6 +246,7 @@ $$(go.GraphLinksModel,
   
   
       function new_visualization(nodes,links,i,direction){
+        editor.gotoLine(json[i].lineNumber);
         if(direction=="next"){
           if(!change_context(json,i)){
             contextos[contextos.length-1] = i
